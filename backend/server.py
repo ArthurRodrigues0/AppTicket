@@ -102,7 +102,7 @@ async def auth_gmail():
             'https://www.googleapis.com/auth/gmail.modify',
             'https://www.googleapis.com/auth/gmail.send'
         ],
-        redirect_uri='http://localhost:3000/gmail-callback'
+        redirect_uri='http://localhost'
     )
     
     authorization_url, state = flow.authorization_url(

@@ -234,6 +234,33 @@ async def get_tickets(
         logger.error(f"Error getting tickets: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@api_router.post("/tickets", response_model=Ticket)
+async def create_ticket(ticket_data: TicketCreate):
+    """Create ticket manually"""
+    try:
+        ticket = Ticket(
+            subject=ticket_data.subject,
+            body=ticket_data.body,
+            sender_email=ticket_data.sender_email,
+            sender_name=ticket_data.sender_name,
+            priority=ticket_data.priority,
+            status="novo"
+        )
+        
+        ticket_dict = ticket.model_dump()
+        ticket_dict['created_at'] = ticket_dict['created_at'].isoformat()
+        ticket_dict['updated_at'] = ticket_dict['updated_at'].isoformat()
+        
+        await db.tickets.insert_one(ticket_dict)
+        
+        logger.info(f"✅ Created ticket manually: {ticket.subject[:50]}")
+        
+        return ticket
+        
+    except Exception as e:
+        logger.error(f"Error creating ticket: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @api_router.get("/tickets/{ticket_id}", response_model=Ticket)
 async def get_ticket(ticket_id: str):
     """Get single ticket by ID"""

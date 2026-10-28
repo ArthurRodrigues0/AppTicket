@@ -1,184 +1,86 @@
-# FreshChamados Pro v2.0
+# AppTicket (FreshChamados Pro) – Help Desk Ticketing System with Gmail Integration
 
-Sistema profissional de gerenciamento de tickets integrado com Gmail API.
+A help desk / service desk web app that turns Gmail emails into support tickets automatically, lets agents reply by email from the app and tracks every ticket on a dashboard.
 
-## 🚀 Funcionalidades
+**Keywords:** Python · FastAPI · REST API · MongoDB · Gmail API · OAuth 2.0 · React · Tailwind CSS · Help desk · Ticketing · ITSM · Process automation
 
-### ✨ Dashboard Profissional
-- Métricas em tempo real (Total, Novos, Em Progresso, Fechados)
-- Interface moderna inspirada no Freshdesk
-- Design responsivo
+## Features
 
-### 🎫 Gestão de Tickets
-- Sincronização automática com Gmail
-- Filtros por status e prioridade
-- Busca inteligente
-- Detecção automática de prioridade
-- Histórico completo de conversas
+- **Gmail sync:** incoming emails become tickets automatically (Gmail API, OAuth 2.0)
+- **Automatic priority detection:** emails with words like "urgent" are flagged as high priority
+- **Reply by email:** answers are sent through the Gmail API in the same email thread
+- **Internal notes:** private comments that are not sent to the customer
+- **Dashboard:** real-time metrics (total, new, in progress, closed) with auto-refresh every 30 seconds
+- **Filters and search:** by status, priority and free text
+- **Responsive UI** for desktop, tablet and mobile
 
-### 📧 Comunicação
-- Responder tickets por email
-- Notas internas (privadas)
-- Histórico de todas as interações
-- Envio direto pelo Gmail API
+## Tech stack
 
-### 🔄 Automação
-- Sync automático do Gmail
-- Status automático
-- Atualização em tempo real
+| Layer | Technologies |
+| --- | --- |
+| Backend | Python, FastAPI, Pydantic, Motor (async MongoDB driver) |
+| Database | MongoDB |
+| Integrations | Gmail API, Google OAuth 2.0 |
+| Frontend | React 19, Tailwind CSS, Axios, Lucide Icons |
 
-## 🛠️ Stack Tecnológica
+## API endpoints
 
-**Backend:**
-- FastAPI (Python)
-- MongoDB
-- Gmail API
-- Motor (async MongoDB driver)
+| Method | Endpoint | Description |
+| --- | --- | --- |
+| GET | `/api/tickets` | List tickets (with filters) |
+| GET | `/api/tickets/{id}` | Ticket details |
+| PATCH | `/api/tickets/{id}` | Update a ticket |
+| POST | `/api/tickets/{id}/reply` | Reply and send the email |
+| GET / POST | `/api/tickets/{id}/notes` | List or add internal notes |
+| GET | `/api/stats` | Dashboard statistics |
+| POST | `/api/sync-gmail` | Sync emails from Gmail |
+| GET | `/api/auth/gmail` | Gmail authentication URL |
 
-**Frontend:**
-- React 19
-- Tailwind CSS
-- Lucide Icons
-- Axios
+## How to run
 
-## 📋 Como Usar
+1. Create a Google Cloud OAuth client with the Gmail API enabled and save it as `backend/credentials.json` (never commit this file).
+2. Backend (`backend/.env`):
+   ```
+   MONGO_URL=mongodb://localhost:27017
+   DB_NAME=freshchamados
+   CORS_ORIGINS=http://localhost:3000
+   ```
+   ```bash
+   cd backend
+   pip install -r requirements.txt
+   uvicorn server:app --reload --port 8001
+   ```
+3. Frontend (`frontend/.env`):
+   ```
+   REACT_APP_BACKEND_URL=http://localhost:8001
+   ```
+   ```bash
+   cd frontend
+   yarn install
+   yarn start
+   ```
+4. Open http://localhost:3000, authenticate Gmail and click **Sync Gmail**.
 
-### 1. Autenticação Gmail (Se necessário)
+## Security
 
-Se o token do Gmail expirar, você precisa re-autenticar:
+- OAuth 2.0 for Gmail; credentials stay on the backend and out of the repository
+- Request validation with Pydantic
+- Configurable CORS
 
-```bash
-# Acesse no navegador:
-http://localhost:3000/auth-gmail
-```
+## Roadmap
 
-Ou pela API:
-```bash
-curl http://localhost:8001/api/auth/gmail
-```
-
-### 2. Sincronizar Emails
-
-Clique no botão **"Sync Gmail"** no dashboard ou:
-
-```bash
-curl -X POST http://localhost:8001/api/sync-gmail
-```
-
-### 3. Visualizar Tickets
-
-Os tickets aparecem automaticamente na tabela. Clique em qualquer ticket para ver detalhes.
-
-### 4. Responder Tickets
-
-1. Abra o ticket clicando na linha
-2. Digite sua resposta no campo "Responder Ticket"
-3. Clique em "Enviar Resposta por Email"
-4. O email será enviado automaticamente via Gmail API
-
-### 5. Adicionar Notas Internas
-
-1. Abra o ticket
-2. Digite no campo "Adicionar Nota"
-3. Marque "Nota interna" se não quiser enviar por email
-4. Clique em "Adicionar Nota"
-
-### 6. Filtrar Tickets
-
-Use os filtros no topo:
-- **Busca:** Digite qualquer termo para buscar
-- **Status:** novo, em_progresso, aguardando, fechado
-- **Prioridade:** baixa, media, alta, urgente
-
-### 7. Atualizar Status
-
-Ações rápidas na tabela:
-- ⏰ **Em Progresso:** Marcar ticket em andamento
-- ✅ **Fechar:** Marcar ticket como fechado
-
-## 🔧 Configuração
-
-### Credenciais Gmail
-
-As credenciais estão em `/app/backend/credentials.json`:
-- CLIENT_ID: `537100678382-2b6u2hcnt374s5clj1n4f30pa9mem53e.apps.googleusercontent.com`
-- CLIENT_SECRET: `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`
-
-### Variáveis de Ambiente
-
-**Backend** (`/app/backend/.env`):
-```
-MONGO_URL=mongodb://localhost:27017
-DB_NAME=freshchamados
-CORS_ORIGINS=*
-```
-
-**Frontend** (`/app/frontend/.env`):
-```
-REACT_APP_BACKEND_URL=https://sistema-ajuda.preview.emergentagent.com
-```
-
-## 📊 Endpoints API
-
-### Tickets
-- `GET /api/tickets` - Listar tickets (com filtros)
-- `GET /api/tickets/{id}` - Detalhes do ticket
-- `PATCH /api/tickets/{id}` - Atualizar ticket
-- `POST /api/tickets/{id}/reply` - Responder e enviar email
-
-### Estatísticas
-- `GET /api/stats` - Dashboard stats
-
-### Gmail
-- `POST /api/sync-gmail` - Sincronizar emails
-- `GET /api/auth/gmail` - URL de autenticação
-
-### Notas
-- `GET /api/tickets/{id}/notes` - Listar notas
-- `POST /api/tickets/{id}/notes` - Criar nota
-
-## 🎨 Design
-
-Interface profissional com:
-- Sidebar gradiente roxo/indigo
-- Cards com sombras suaves
-- Badges coloridos para status e prioridade
-- Modal moderno para detalhes
-- Animações suaves
-- Feedback visual
-
-## 🔐 Segurança
-
-- OAuth2 para Gmail
-- Credenciais não expostas no frontend
-- CORS configurado
-- Validação de dados com Pydantic
-
-## 📱 Responsivo
-
-Funciona perfeitamente em:
-- Desktop
-- Tablet
-- Mobile
-
-## 🚀 Próximas Funcionalidades
-
-- [ ] Multi-agentes (vários usuários)
-- [ ] Templates de resposta
+- [ ] Multiple agents
+- [ ] Reply templates
 - [ ] SLA tracking
-- [ ] Anexos de arquivos
-- [ ] Relatórios avançados
-- [ ] Tema escuro
-- [ ] Notificações push
-- [ ] Integração WhatsApp
-
-## 💡 Dicas
-
-1. **Auto-refresh:** Os tickets são atualizados automaticamente a cada 30 segundos
-2. **Prioridade automática:** Emails com palavras como "urgente", "emergência" são marcados como alta prioridade
-3. **Thread tracking:** Respostas são enviadas no mesmo thread do Gmail
-4. **Notas vs Respostas:** Use notas internas para comentários privados que não serão enviados ao cliente
+- [ ] File attachments
+- [ ] Advanced reports
 
 ---
 
-**FreshChamados Pro v2.0** - Sistema Profissional de Atendimento
+## 🇧🇷 Em português
+
+Sistema de chamados (help desk) integrado ao Gmail: transforma e-mails em tickets automaticamente, detecta a prioridade, permite responder por e-mail pelo próprio sistema e mostra métricas em um dashboard. Backend em Python (FastAPI) com MongoDB e frontend em React com Tailwind CSS.
+
+## Author
+
+**Arthur Rodrigues Chaves** · [LinkedIn](https://linkedin.com/in/arthur-rodrigues-267b9923a) · [GitHub](https://github.com/ArthurRodrigues0)
